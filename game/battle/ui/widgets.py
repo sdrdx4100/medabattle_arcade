@@ -19,20 +19,20 @@ def draw_atb_bar(unit: Unit) -> None:  # pragma: no cover - visual
     left = x - BAR_W / 2
     bottom = y - 30
     color = arcade.color.GREEN if unit.side == "ally" else arcade.color.ORANGE
-    arcade.draw_rectangle_filled(  # type: ignore[attr-defined]
-        left + BAR_W / 2,
-        bottom + BAR_H / 2,
+    arcade.draw_lbwh_rectangle_filled(
+        left,
+        bottom,
         BAR_W,
         BAR_H,
         arcade.color.GRAY,
-    )
-    arcade.draw_rectangle_filled(  # type: ignore[attr-defined]
-        left + (BAR_W * ratio) / 2,
-        bottom + BAR_H / 2,
+    )  # type: ignore[attr-defined]
+    arcade.draw_lbwh_rectangle_filled(
+        left,
+        bottom,
         BAR_W * ratio,
         BAR_H,
         color,
-    )
+    )  # type: ignore[attr-defined]
 
 
 class CommandMenu:
