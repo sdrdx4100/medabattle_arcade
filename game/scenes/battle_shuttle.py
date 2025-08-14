@@ -88,7 +88,12 @@ class BattleShuttleScene(BaseScene):
         if self.controller.last_message:
             self.msg_window.push(self.controller.last_message)
             self.controller.last_message = None
-        self.controller.check_victory()
+        result = self.controller.check_victory()
+        if result != "ongoing":
+            from .battle_result import BattleResultScene
+
+            outcome = "win" if result == "ally" else "lose"
+            self.window.scene_stack.replace(BattleResultScene(self.window, outcome))
 
     def on_key_press(self, symbol: int, modifiers: int) -> None:
         self.router.on_key_press(symbol, modifiers)

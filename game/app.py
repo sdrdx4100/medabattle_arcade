@@ -23,10 +23,10 @@ class MainApp(arcade.Window):
         self.save_slot: int | None = None
         self.save_data = None
 
-        from .scenes.battle_shuttle import BattleShuttleScene
+        from .scenes.title import TitleScene
 
-        # Launch directly into the shuttle-run battle scene for testing
-        self.scene_stack.push(BattleShuttleScene(self))
+        # Start at the title scene to allow menu navigation
+        self.scene_stack.push(TitleScene(self))
 
     def on_draw(self) -> None:
         self.clear()
