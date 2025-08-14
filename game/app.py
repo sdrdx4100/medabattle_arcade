@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 import arcade
 
 from .core.config import load_config
 from .core.scene import SceneStack
-
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +23,10 @@ class MainApp(arcade.Window):
         self.save_slot: int | None = None
         self.save_data = None
 
-        from .scenes.title import TitleScene
+        from .scenes.battle_shuttle import BattleShuttleScene
 
-        self.scene_stack.push(TitleScene(self))
+        # Launch directly into the shuttle-run battle scene for testing
+        self.scene_stack.push(BattleShuttleScene(self))
 
     def on_draw(self) -> None:
         self.clear()

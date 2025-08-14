@@ -1,0 +1,4 @@
+[
+  {"id":"melee_punch","name":"なぐる","type":"MELEE","power":12,"hit":0.92,"cooldown":1.0,"charge_anim":"run","act_anim":"slash","effect":"shake"},
+  {"id":"range_shot","name":"ショット","type":"RANGE","power":9,"hit":0.85,"cooldown":1.0,"charge_anim":"run","act_anim":"shot","effect":"flash"}
+]
