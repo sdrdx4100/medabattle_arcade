@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import time
+from typing import Any, cast
+
 import arcade
 
 from ..core.input import InputRouter
@@ -13,8 +15,12 @@ from ..core.scene import BaseScene
 class MainMenuScene(BaseScene):
     """Overlay menu with save option."""
 
+    window: Any
+
     def __init__(self, window: arcade.Window) -> None:
         super().__init__(window)
+        # Treat window as dynamic for type checking
+        self.window = cast(Any, window)
         self.options = ["アイテム", "セーブ", "戻る"]
         self.index = 0
         self.toast: str | None = None
