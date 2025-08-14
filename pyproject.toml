@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "medabattle-arcade"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I", "B", "UP", "S", "W"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
