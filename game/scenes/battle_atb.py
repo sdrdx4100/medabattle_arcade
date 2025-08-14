@@ -57,7 +57,7 @@ class BattleScene(BaseScene):
 
     # drawing
     def on_draw(self) -> None:  # pragma: no cover - visuals
-        arcade.start_render()
+        self.window.clear()
         # grid
         for x in range(GRID_W):
             arcade.draw_line(x * TILE, 0, x * TILE, GRID_H * TILE, arcade.color.GRAY)
@@ -68,12 +68,18 @@ class BattleScene(BaseScene):
             if not u.alive:
                 continue
             sx, sy = self.to_screen(u.x, u.y)
-            arcade.draw_rectangle_filled(sx, sy, TILE - 4, TILE - 4, u.color)
+            arcade.draw_lbwh_rectangle_filled(
+                sx - (TILE - 4) / 2,
+                sy - (TILE - 4) / 2,
+                TILE - 4,
+                TILE - 4,
+                u.color,
+            )
             # ATB bar
             bar_w = (TILE - 4) * min(u.atb, 1.0)
-            arcade.draw_rectangle_filled(
-                sx - (TILE - 4) / 2 + bar_w / 2,
-                sy + TILE / 2,
+            arcade.draw_lbwh_rectangle_filled(
+                sx - (TILE - 4) / 2,
+                sy + TILE / 2 - 4 / 2,
                 bar_w,
                 4,
                 arcade.color.GREEN,

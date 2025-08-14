@@ -21,16 +21,19 @@ class StoryScene(BaseScene):
         story_path = DATA_DIR / "story" / "episode01.json"
         raw: List[List[str]] = json.loads(story_path.read_text(encoding="utf-8"))
         self.messages: List[Tuple[str, str]] = [(m[0], m[1]) for m in raw]
+        if not self.messages:
+            # Fallback single empty message to avoid IndexError when story data is missing
+            self.messages = [("", "")]
         self.index = 0
         self.router = InputRouter(confirm=self.advance, menu=self.open_menu)
 
     def on_draw(self) -> None:  # pragma: no cover - visuals
-        arcade.start_render()
+        self.window.clear()
         line1, line2 = self.messages[self.index]
         box_y = 100
-        arcade.draw_rectangle_filled(
-            self.window.width / 2,
-            box_y,
+        arcade.draw_lbwh_rectangle_filled(
+            self.window.width / 2 - (self.window.width - 40) / 2,
+            box_y - 100 / 2,
             self.window.width - 40,
             100,
             (0, 0, 0, 180),

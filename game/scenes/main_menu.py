@@ -51,10 +51,10 @@ class MainMenuScene(BaseScene):
         self.router.on_key_press(symbol, modifiers)
 
     def on_draw(self) -> None:  # pragma: no cover - visuals
-        arcade.start_render()
-        arcade.draw_rectangle_filled(
-            self.window.width / 2,
-            self.window.height / 2,
+        self.window.clear()
+        arcade.draw_lbwh_rectangle_filled(
+            self.window.width / 2 - 300 / 2,
+            self.window.height / 2 - 300 / 2,
             300,
             300,
             (0, 0, 0, 180),

@@ -52,7 +52,7 @@ class SaveSelectScene(BaseScene):
         self.router.on_key_press(symbol, modifiers)
 
     def on_draw(self) -> None:  # pragma: no cover - visuals
-        arcade.start_render()
+        self.window.clear()
         arcade.draw_text(
             "セーブスロット",
             self.window.width / 2,
