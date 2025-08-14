@@ -44,9 +44,9 @@ class StoryScene(BaseScene):
     def advance(self) -> None:
         self.index += 1
         if self.index >= len(self.messages):
-            from .battle_atb import BattleScene
+            from .battle_shuttle import BattleShuttleScene
 
-            self.window.scene_stack.replace(BattleScene(self.window))
+            self.window.scene_stack.replace(BattleShuttleScene(self.window))
 
     def open_menu(self) -> None:
         from .main_menu import MainMenuScene
