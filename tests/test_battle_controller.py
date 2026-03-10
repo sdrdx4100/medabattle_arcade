@@ -22,10 +22,10 @@ def build_unit(
     spd: float = 1.0,
 ) -> Unit:
     parts: dict[PartSlot, Part] = {
-        "head": Part("head", "ミサイル", "head_missile", head_hp, head_hp),
-        "right_arm": Part("right_arm", "ライフル", "right_rifle", right_hp, right_hp),
-        "left_arm": Part("left_arm", "ハンマー", "left_hammer", left_hp, left_hp),
-        "legs": Part("legs", "ブレイク脚", "leg_breaker", legs_hp, legs_hp),
+        "head": Part("head", "Head", "head_missile", head_hp, head_hp),
+        "right_arm": Part("right_arm", "Right Arm", "right_rifle", right_hp, right_hp),
+        "left_arm": Part("left_arm", "Left Arm", "left_hammer", left_hp, left_hp),
+        "legs": Part("legs", "Legs", "leg_breaker", legs_hp, legs_hp),
     }
     unit = Unit(
         id=unit_id,

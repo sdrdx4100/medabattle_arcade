@@ -23,7 +23,7 @@ from .animations import (
 from .animations import (
     update as anim_update,
 )
-from .models import Part, PartSlot, PlannedAction, Unit
+from .models import PART_SLOTS, Part, PartSlot, PlannedAction, Unit
 
 PX_PER_SEC = 180
 CENTER_X = 400
@@ -169,7 +169,7 @@ class BattleController:
             pop_damage(0, target.pos)
             return
         target_slot = skill.get("target_part", "head")
-        if target_slot not in {"head", "right_arm", "left_arm", "legs"}:
+        if target_slot not in PART_SLOTS:
             target_slot = "head"
         target_part = self._resolve_target_part(target, cast(PartSlot, target_slot))
         if not target_part:
@@ -272,6 +272,6 @@ class BattleController:
 
     def _is_unit_destroyed(self, target: Unit) -> bool:
         head = target.get_part("head")
-        return (head is not None and head.hp <= 0) or all(
+        return (head is not None and not head.is_operational) or all(
             not part.is_operational for part in target.parts.values()
         )

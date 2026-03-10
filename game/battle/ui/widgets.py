@@ -6,7 +6,7 @@ from collections import deque
 
 import arcade
 
-from ..core.models import PartSlot, Unit
+from ..core.models import PART_SLOTS, PartSlot, Unit
 
 BAR_W = 60
 BAR_H = 6
@@ -68,7 +68,7 @@ class CommandMenu:
 
 
 class MessageWindow:
-    """Bottom message log displaying up to two lines."""
+    """Bottom message log displaying up to three lines."""
 
     def __init__(self) -> None:
         self.lines: deque[str] = deque(maxlen=3)
@@ -102,13 +102,12 @@ def draw_team_panel(
         "left_arm": "L-ARM",
         "legs": "LEGS",
     }
-    part_order: tuple[PartSlot, ...] = ("head", "right_arm", "left_arm", "legs")
     for i, unit in enumerate(units):
         base_y = y - 48 - i * line_height
         color = arcade.color.YELLOW if unit.id == highlight_id else arcade.color.WHITE
         state = "DOWN" if unit.state == "DEAD" else f"HP {unit.hp}"
         arcade.draw_text(f"{unit.name}  {state}", x + 10, base_y, color, 13)
-        for offset, slot in enumerate(part_order):
+        for offset, slot in enumerate(PART_SLOTS):
             part = unit.get_part(slot)
             if part:
                 part_text = (

@@ -7,6 +7,7 @@ from typing import Literal
 
 Vec2 = tuple[float, float]
 PartSlot = Literal["head", "right_arm", "left_arm", "legs"]
+PART_SLOTS: tuple[PartSlot, ...] = ("head", "right_arm", "left_arm", "legs")
 
 
 @dataclass
