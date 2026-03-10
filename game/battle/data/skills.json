@@ -1,4 +1,74 @@
 [
-  {"id":"melee_punch","name":"なぐる","type":"MELEE","power":12,"hit":0.92,"cooldown":1.0,"charge_anim":"run","act_anim":"slash","effect":"shake"},
-  {"id":"range_shot","name":"ショット","type":"RANGE","power":9,"hit":0.85,"cooldown":1.0,"charge_anim":"run","act_anim":"shot","effect":"flash"}
+  {
+    "id": "melee_punch",
+    "name": "Punch",
+    "type": "MELEE",
+    "power": 12,
+    "hit": 0.92,
+    "cooldown": 1.0,
+    "charge_anim": "run",
+    "act_anim": "slash",
+    "effect": "shake",
+    "target_part": "head"
+  },
+  {
+    "id": "range_shot",
+    "name": "Shot",
+    "type": "RANGE",
+    "power": 9,
+    "hit": 0.85,
+    "cooldown": 1.0,
+    "charge_anim": "run",
+    "act_anim": "shot",
+    "effect": "flash",
+    "target_part": "right_arm"
+  },
+  {
+    "id": "head_missile",
+    "name": "Missile",
+    "type": "RANGE",
+    "power": 10,
+    "hit": 0.95,
+    "cooldown": 1.0,
+    "charge_anim": "run",
+    "act_anim": "shot",
+    "effect": "flash",
+    "target_part": "head"
+  },
+  {
+    "id": "right_rifle",
+    "name": "Rifle",
+    "type": "RANGE",
+    "power": 9,
+    "hit": 0.98,
+    "cooldown": 1.0,
+    "charge_anim": "run",
+    "act_anim": "shot",
+    "effect": "flash",
+    "target_part": "right_arm"
+  },
+  {
+    "id": "left_hammer",
+    "name": "Hammer",
+    "type": "MELEE",
+    "power": 11,
+    "hit": 0.9,
+    "cooldown": 1.0,
+    "charge_anim": "run",
+    "act_anim": "slash",
+    "effect": "shake",
+    "target_part": "left_arm"
+  },
+  {
+    "id": "leg_breaker",
+    "name": "Leg Breaker",
+    "type": "MELEE",
+    "power": 8,
+    "hit": 1.0,
+    "cooldown": 1.0,
+    "charge_anim": "run",
+    "act_anim": "slash",
+    "effect": "shake",
+    "target_part": "legs"
+  }
 ]
