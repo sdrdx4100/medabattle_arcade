@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+
 import arcade
 
 from ..core.scene import BaseScene
@@ -32,4 +33,4 @@ class BattleResultScene(BaseScene):
         if time.time() - self.start > 2:
             from .main_menu import MainMenuScene
 
-            self.window.scene_stack.replace(MainMenuScene(self.window))
+            self.window.scene_stack.replace(MainMenuScene(self.window))  # type: ignore[attr-defined]

@@ -8,6 +8,7 @@ from collections import deque
 from collections.abc import Callable
 from pathlib import Path
 from random import random
+from typing import cast
 
 import arcade
 
@@ -22,7 +23,7 @@ from .animations import (
 from .animations import (
     update as anim_update,
 )
-from .models import PlannedAction, Unit
+from .models import PART_SLOTS, Part, PartSlot, PlannedAction, Unit
 
 PX_PER_SEC = 180
 CENTER_X = 400
@@ -47,6 +48,7 @@ class BattleController:
         self.last_message: str | None = None
 
     def add_unit(self, unit: Unit) -> None:
+        unit.sync_hp()
         self.units[unit.id] = unit
 
     # update & draw
@@ -90,6 +92,14 @@ class BattleController:
             color = arcade.color.BLUE if unit.side == "ally" else arcade.color.RED
             arcade.draw_circle_filled(x, y, 20, color)
             draw_atb_bar(unit)
+            arcade.draw_text(
+                f"{unit.name}  HP {unit.hp}",
+                x,
+                y + 28,
+                arcade.color.WHITE,
+                12,
+                anchor_x="center",
+            )
 
     def draw_effect(self) -> None:  # pragma: no cover - visual
         anim_draw()
@@ -99,22 +109,44 @@ class BattleController:
         ready = list(self.ready_queue)
         self.ready_queue.clear()
         ready.sort(key=lambda u: (-u.stats.spd, -u.atb, random()))  # noqa: S311
+        player_command_open = any(
+            unit.side == "ally" and unit.state == "COMMAND"
+            for unit in self.units.values()
+        )
+        deferred_allies: list[Unit] = []
         for unit in ready:
+            if unit.state != "IDLE":
+                continue
             if unit.side == "ally":
+                if player_command_open:
+                    deferred_allies.append(unit)
+                    continue
                 self.start_command(unit)
+                player_command_open = True
             else:
-                target = self._find_target(unit)
-                if target:
-                    self.decide_action(unit, "melee_punch", target)
+                self._decide_enemy_action(unit)
+        for unit in deferred_allies:
+            self.ready_queue.append(unit)
 
     def start_command(self, unit: Unit) -> None:
         unit.state = "COMMAND"
         if self.on_command:
             self.on_command(unit)
 
-    def decide_action(self, unit: Unit, skill_id: str, target: Unit) -> None:
+    def decide_action(
+        self,
+        unit: Unit,
+        skill_id: str,
+        target: Unit,
+        source_slot: PartSlot | None = None,
+    ) -> None:
         unit.action_queue.append(
-            PlannedAction(skill_id=skill_id, user_id=unit.id, target_id=target.id)
+            PlannedAction(
+                skill_id=skill_id,
+                user_id=unit.id,
+                target_id=target.id,
+                source_slot=source_slot,
+            )
         )
         unit.state = "CHARGE"
 
@@ -126,22 +158,46 @@ class BattleController:
         skill = SKILLS.get(pa.skill_id)
         if not skill:
             return
+        if pa.source_slot:
+            source_part = user.get_part(pa.source_slot)
+            if not source_part or not source_part.is_operational:
+                self.last_message = f"{user.name} cannot act: source part broken!"
+                return
         play_effect(skill.get("effect", ""), user, target)
         if random() > skill.get("hit", 1.0):  # noqa: S311
-            self.last_message = f"{user.name} の {skill['name']} は ミス！"
+            self.last_message = f"{user.name}'s {skill['name']} missed!"
             pop_damage(0, target.pos)
             return
-        dmg = max(1, skill["power"] + user.stats.atk - target.stats.defn)
-        target.hp -= dmg
-        pop_damage(dmg, target.pos)
-        if target.hp <= 0:
+        target_slot = skill.get("target_part", "head")
+        if target_slot not in PART_SLOTS:
+            target_slot = "head"
+        target_part = self._resolve_target_part(target, cast(PartSlot, target_slot))
+        if not target_part:
+            self.last_message = f"{target.name} is already disabled!"
             target.state = "DEAD"
-            self.last_message = (
-                f"{user.name} の {skill['name']}！ {target.name} を たおした!"
-            )
+            target.hp = 0
+            return
+        dmg = max(
+            1,
+            skill["power"] + user.stats.atk - target.stats.defn - target_part.armor,
+        )
+        target_part.hp = max(0, target_part.hp - dmg)
+        target.sync_hp()
+        pop_damage(dmg, target.pos)
+        if target_part.hp <= 0:
+            part_break = f"{target.name}'s {target_part.name} broke!"
         else:
+            part_break = ""
+        if self._is_unit_destroyed(target):
+            target.state = "DEAD"
+            target.hp = 0
+            self.last_message = f"{user.name}'s {skill['name']} disabled {target.name}!"
+        else:
+            action_message = (
+                f"{user.name}'s {skill['name']} hit {target.name} for {dmg}"
+            )
             self.last_message = (
-                f"{user.name} の {skill['name']}！ {target.name} に {dmg} ダメージ"
+                f"{action_message} / {part_break}" if part_break else action_message
             )
         logger.info(self.last_message)
 
@@ -183,3 +239,39 @@ class BattleController:
         if not enemies:
             return None
         return min(enemies, key=lambda e: abs(e.pos[0] - unit.pos[0]))
+
+    def _decide_enemy_action(self, unit: Unit) -> None:
+        actions = unit.available_parts()
+        if not actions:
+            unit.atb = 0.0
+            return
+        target = self._find_weakest_target(unit)
+        if not target:
+            return
+        chosen_part = max(actions, key=lambda part: SKILLS[part.skill_id]["power"])
+        self.decide_action(unit, chosen_part.skill_id, target, chosen_part.slot)
+
+    def _find_weakest_target(self, unit: Unit) -> Unit | None:
+        enemies = [
+            target
+            for target in self.units.values()
+            if target.side != unit.side and target.state != "DEAD"
+        ]
+        if not enemies:
+            return None
+        return min(enemies, key=lambda target: (target.hp, target.lane))
+
+    def _resolve_target_part(self, target: Unit, preferred: PartSlot) -> Part | None:
+        preferred_part = target.get_part(preferred) if preferred else None
+        if preferred_part and preferred_part.is_operational:
+            return preferred_part
+        for part in target.parts.values():
+            if part.is_operational:
+                return part
+        return None
+
+    def _is_unit_destroyed(self, target: Unit) -> bool:
+        head = target.get_part("head")
+        return (head is not None and not head.is_operational) or all(
+            not part.is_operational for part in target.parts.values()
+        )
